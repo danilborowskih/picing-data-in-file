@@ -1,5 +1,6 @@
-import pickle , os
-import timeit
+import pickle ,os
+import time
+start_time = time.time()
 #эта версия в функциях но без numpy
 class MyClass:
 
@@ -32,10 +33,6 @@ class MyClass:
             except:
                 break
         return n
-    
-    def fill_results_in_list(self,file_iter)->list:
-        return [func_result for i, func_result in enumerate(self.func(file_iter*self.step))
-                if i < self.step or (file_iter == self.num_of_blocks - 1)]# здесь мы наполняем лист для записи его в файл
                 
     def Dump(self,reslist,i):
         with open(self.path_arr[i],'wb') as f:
@@ -46,7 +43,9 @@ class MyClass:
             iterator_for_start_value = file_iterator*self.step  # указывает номер переменной с которой начнется func
             print(file_iterator)
             while file_iterator < self.num_of_blocks:
-                res_list = MyClass.fill_results_in_list(self,file_iterator)
+                res_list = [func_result for i, func_result in enumerate(self.func(file_iterator*self.step))
+                if i < self.step or (file_iterator == self.num_of_blocks - 1)]# здесь мы наполняем лист для записи его в файл
+                
                 MyClass.Dump(self,res_list,file_iterator)  # записываем в файл
                 file_iterator += 1  # считаем уже заполненные файлы
     
@@ -58,11 +57,12 @@ class MyClass:
             print(res_list)
 
 
-
 def some_func(start):
-    for i in range(start,33):
-        yield i**2
+    for i in range(start,1000000):
+        yield i
 if __name__=='__main__':
-    test = MyClass(some_func,33,5)
+    test = MyClass(some_func,1000000,5)
     test.sep_exe()
     test.load_compl()
+    
+print("--- %s seconds ---" % (time.time() - start_time))
